@@ -54,33 +54,33 @@ export default function GridRow({ row, start, activeCell, setActiveCell, rowInde
           
         />
       </div>
-      <GridCell editingCell={editingCell} field="vendor_name" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={1} error={error}>
+      <GridCell editingCell={editingCell} field="vendor_name" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={0} error={error}>
         {row.vendor_name}
       </GridCell>
 
-      <GridCell editingCell={editingCell} field="vendor_gstin" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={2} error={error}>
+      <GridCell editingCell={editingCell} field="vendor_gstin" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={1} error={error}>
         {row.vendor_gstin}
       </GridCell>
 
-      <GridCell editingCell={editingCell} field="invoice_number" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={3} error={error}>
+      <GridCell editingCell={editingCell} field="invoice_number" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={2} error={error}>
         {row.invoice_number}
         </GridCell>
 
-      <GridCell editingCell={editingCell} field="invoice_date" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={4} error={error}>
+      <GridCell editingCell={editingCell} field="invoice_date" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={3} error={error}>
         {row.invoice_date}
       </GridCell>
 
-      <GridCell editingCell={editingCell} field="total_amount" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={5} error={error}>
+      <GridCell editingCell={editingCell} field="total_amount" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={4} error={error}>
         ₹{row.total_amount.toLocaleString()}
       </GridCell>
 
-      <GridCell editingCell={editingCell} field="gstr2b_amount" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={6} error={error}>
+      <GridCell editingCell={editingCell} field="gstr2b_amount" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={5} error={error}>
         {row.gstr2b_amount
           ? `₹${row.gstr2b_amount.toLocaleString()}`
           : "-"}
       </GridCell>
 
-      <GridCell field="status" rowIndex={rowIndex} columnIndex={7} error={error}>
+      <GridCell field="status" rowIndex={rowIndex} columnIndex={6} error={error}>
         {row.status}
       </GridCell>
     </div>

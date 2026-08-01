@@ -2,7 +2,7 @@ import GridHeader from "./gridHeader";
 import GridBody from "./gridBoady";
 import { Invoice } from "../../types/invoice";
 import { useKeyboardNavigation } from "../../hooks/keyboardNavigationHook";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface GridProps {
   rows: Invoice[];
@@ -26,8 +26,16 @@ export default function Grid({ rows }: GridProps) {
   } | null>(null);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
-  const { activeCell, setActiveCell, handleKeyDown } = useKeyboardNavigation(rows.length, columns.length);
+  const { activeCell, setActiveCell, handleKeyDown } = useKeyboardNavigation(rows.length, columns.length-1, setEditingCell);
+  
+  useEffect(() => {
+    if (gridRef.current) {
+      gridRef.current.focus();
+    }
+  }, []);
+
   const isAllSelected = rows.length > 0 && (selectedRows && selectedRows.size === rows.length);
   const GSTIN_REGEX =
   /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
@@ -57,6 +65,7 @@ const isValidGSTIN = (gstin: string)=>{
 
     if (setEditingCell) {
       setEditingCell(null);
+      gridRef.current?.focus();
     }
   };
 
@@ -102,7 +111,7 @@ const isValidGSTIN = (gstin: string)=>{
   }
 
   return (
-    <div tabIndex={0} onKeyDown={handleKeyDown} className="flex h-screen w-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow outline-none">
+    <div tabIndex={0} ref={gridRef} onKeyDown={handleKeyDown} className="flex h-screen w-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow outline-none">
       <GridHeader error={error} selectedRows={selectedRows} selectallRows={selectallRows} columns={columns} markAsReconciled={markAsReconciled}/>
       <GridBody error={error} selectedRows={selectedRows} handleSelectRow={handleSelectRow} activeCell={activeCell} setActiveCell={handleSetActiveCell} rows={rowsData} saveEdit={saveEdit} editingCell={editingCell} setEditingCell={setEditingCell} />
     </div>
