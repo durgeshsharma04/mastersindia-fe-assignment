@@ -1,4 +1,5 @@
-const invoiceData = [
+import { Invoice } from './types/invoice';
+const invoiceData: Invoice[]  = [
   {
     "id": "inv-0001",
     "vendor_name": "Axis Infrastructures Group",
