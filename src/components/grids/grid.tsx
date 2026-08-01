@@ -2,6 +2,7 @@ import GridHeader from "./gridHeader";
 import GridBody from "./gridBoady";
 import { Invoice } from "../../types/invoice";
 import { useKeyboardNavigation } from "../../hooks/keyboardNavigationHook";
+import { useState } from "react";
 
 interface GridProps {
   rows: Invoice[];
@@ -18,6 +19,11 @@ const columns = [
 ];
 
 export default function Grid({ rows }: GridProps) {
+  const [rowsData, setRowsData] = useState<Invoice[]>(rows);
+  const [editingCell, setEditingCell] = useState<{
+    row: number;
+    col: number;
+  } | null>(null);
   const { activeCell, setActiveCell, handleKeyDown } = useKeyboardNavigation(rows.length, columns.length);
 
   const handleSetActiveCell = (cell: { row: number; col: number } | null) => {
@@ -29,7 +35,7 @@ export default function Grid({ rows }: GridProps) {
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} className="flex h-screen w-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow outline-none">
       <GridHeader columns={columns} />
-      <GridBody activeCell={activeCell} setActiveCell={handleSetActiveCell} rows={rows} />
+      <GridBody activeCell={activeCell} setActiveCell={handleSetActiveCell} rows={rowsData} setRows={setRowsData} editingCell={editingCell} setEditingCell={setEditingCell}/>
     </div>
   );
 }

@@ -14,5 +14,6 @@ export interface Invoice {
     | "matched"
     | "amount_mismatch"
     | "gstin_mismatch"
-    | "missing_in_gstr2b";
+    | "missing_in_gstr2b"
+    | "unreconciled";
 }

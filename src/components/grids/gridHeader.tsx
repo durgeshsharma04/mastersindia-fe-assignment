@@ -1,12 +1,3 @@
-// const columns = [
-//   "Vendor",
-//   "GSTIN",
-//   "Invoice",
-//   "Date",
-//   "Amount",
-//   "GSTR-2B",
-//   "Status",
-// ];
 
 interface GridHeaderProps {
   columns: string[];

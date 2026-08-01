@@ -1,4 +1,4 @@
-import { useRef, useEffect} from "react";
+import { useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import GridRow from "./gridRow";
 import { Invoice } from "../../types/invoice";
@@ -7,9 +7,12 @@ interface Props {
   rows: Invoice[];
   activeCell: { row: number; col: number } | null;
   setActiveCell: (cell: { row: number; col: number } | null) => void;
+  setRows?: React.Dispatch<React.SetStateAction<Invoice[]>>;
+  editingCell: { row: number; col: number } | null;
+  setEditingCell: (cell: { row: number; col: number } | null) => void;
 }
 
-export default function GridBody({ rows, activeCell, setActiveCell }: Props) {
+export default function GridBody({ rows, activeCell, setActiveCell, setRows, editingCell, setEditingCell }: Props) {
   const parentRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -46,6 +49,9 @@ export default function GridBody({ rows, activeCell, setActiveCell }: Props) {
             activeCell={activeCell}
             setActiveCell={setActiveCell}
             rowIndex={virtualRow.index}
+            editingCell={editingCell}
+            setEditingCell={setEditingCell}
+            setRows={setRows}
           />
         ))}
       </div>
