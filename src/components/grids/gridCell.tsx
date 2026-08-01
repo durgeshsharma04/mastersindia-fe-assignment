@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 
 interface Props {
   children: ReactNode;
@@ -23,20 +23,24 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
     editingCell?.row === rowIndex &&
     editingCell?.col === columnIndex;
 
+  useEffect(() => {
+    if (isEditing) {
+      setInputValue(children?.toString() || "");
+    }
+  }, [isEditing, children]);
+
   const handleDoubleClick = () => {
     if (setEditingCell && !error) {
       setEditingCell({
         row: rowIndex,
         col: columnIndex,
       });
-      setInputValue(children?.toString() || "");
+      // setInputValue(children?.toString() || "");
     }
   }
 
-
-
   const handleOnClick = () => {
-   setActiveCell && setActiveCell({
+    setActiveCell && setActiveCell({
       row: rowIndex,
       col: columnIndex,
     });
@@ -45,14 +49,14 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
-  
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    console.log("Key pressed:", e.key);
     if (e.key === "Enter") {
+       e.stopPropagation();
       saveEdit && saveEdit(rowIndex, field, inputValue);
     }
 
-     if (e.key === "Escape") {
+    if (e.key === "Escape") {
       if (setEditingCell && !error) {
         setEditingCell(null);
       }
