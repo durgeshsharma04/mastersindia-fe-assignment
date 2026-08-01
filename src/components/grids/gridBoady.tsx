@@ -7,12 +7,15 @@ interface Props {
   rows: Invoice[];
   activeCell: { row: number; col: number } | null;
   setActiveCell: (cell: { row: number; col: number } | null) => void;
-  setRows?: React.Dispatch<React.SetStateAction<Invoice[]>>;
+  saveEdit: (rowIndex: number, field: string, inputValue: string) => void;
   editingCell: { row: number; col: number } | null;
   setEditingCell: (cell: { row: number; col: number } | null) => void;
+  handleSelectRow?: (rowId: string) => void;
+  selectedRows?: Set<string>;
+  error : string | null;
 }
 
-export default function GridBody({ rows, activeCell, setActiveCell, setRows, editingCell, setEditingCell }: Props) {
+export default function GridBody({ rows, activeCell, setActiveCell, saveEdit, editingCell, setEditingCell, handleSelectRow, selectedRows, error }: Props) {
   const parentRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -51,7 +54,10 @@ export default function GridBody({ rows, activeCell, setActiveCell, setRows, edi
             rowIndex={virtualRow.index}
             editingCell={editingCell}
             setEditingCell={setEditingCell}
-            setRows={setRows}
+            saveEdit={saveEdit}
+            selectedRows={selectedRows}
+            handleSelectRow={handleSelectRow}
+            error={error}
           />
         ))}
       </div>

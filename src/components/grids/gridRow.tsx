@@ -10,10 +10,16 @@ interface Props {
   rowIndex: number;
   editingCell: { row: number; col: number } | null;
   setEditingCell: (cell: { row: number; col: number } | null) => void;
-  setRows?: React.Dispatch<React.SetStateAction<Invoice[]>>;
+  saveEdit: (rowIndex: number, field: string, inputValue: string) => void;
+  selectedRows?: Set<string>;
+  handleSelectRow?: (rowId: string) => void;
+  error: string | null;
 }
 
-export default function GridRow({ row, start, activeCell, setActiveCell, rowIndex, editingCell, setEditingCell, setRows }: Props) {
+export default function GridRow({ row, start, activeCell, setActiveCell, rowIndex, editingCell, setEditingCell, saveEdit, selectedRows, handleSelectRow, error }: Props) {
+
+  const isSelected = selectedRows && selectedRows.has(row.id);
+
   return (
     <div
       className={clsx(
@@ -24,7 +30,7 @@ export default function GridRow({ row, start, activeCell, setActiveCell, rowInde
         grid
         h-12
         items-center
-        grid-cols-[240px_220px_180px_150px_160px_160px_180px]
+        grid-cols-[48px_240px_220px_180px_150px_160px_160px_180px]
         border-b
         hover:bg-blue-50
         `,
@@ -40,23 +46,41 @@ export default function GridRow({ row, start, activeCell, setActiveCell, rowInde
         transform: `translateY(${start}px)`,
       }}
     >
-      <GridCell editingCell={editingCell} field="vendor_name" setEditingCell={setEditingCell} setRows={setRows} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={1}>{row.vendor_name}</GridCell>
+      <div className="truncate border-r border-gray-200 px-4 py-3 last:border-r-0">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={() => handleSelectRow && handleSelectRow(row.id)}
+          
+        />
+      </div>
+      <GridCell editingCell={editingCell} field="vendor_name" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={1} error={error}>
+        {row.vendor_name}
+      </GridCell>
 
-      <GridCell editingCell={editingCell} field="vendor_gstin" setEditingCell={setEditingCell} setRows={setRows} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={2}>{row.vendor_gstin}</GridCell>
+      <GridCell editingCell={editingCell} field="vendor_gstin" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={2} error={error}>
+        {row.vendor_gstin}
+      </GridCell>
 
-      <GridCell editingCell={editingCell} field="invoice_number" setEditingCell={setEditingCell} setRows={setRows} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={3}>{row.invoice_number}</GridCell>
+      <GridCell editingCell={editingCell} field="invoice_number" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={3} error={error}>
+        {row.invoice_number}
+        </GridCell>
 
-      <GridCell editingCell={editingCell} field="invoice_date" setEditingCell={setEditingCell} setRows={setRows} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={4}>{row.invoice_date}</GridCell>
+      <GridCell editingCell={editingCell} field="invoice_date" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={4} error={error}>
+        {row.invoice_date}
+      </GridCell>
 
-      <GridCell editingCell={editingCell} field="total_amount" setEditingCell={setEditingCell} setRows={setRows} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={5}>₹{row.total_amount.toLocaleString()}</GridCell>
+      <GridCell editingCell={editingCell} field="total_amount" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={5} error={error}>
+        ₹{row.total_amount.toLocaleString()}
+      </GridCell>
 
-      <GridCell editingCell={editingCell} field="gstr2b_amount" setEditingCell={setEditingCell} setRows={setRows} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={6}>
+      <GridCell editingCell={editingCell} field="gstr2b_amount" setEditingCell={setEditingCell} saveEdit={saveEdit} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={6} error={error}>
         {row.gstr2b_amount
           ? `₹${row.gstr2b_amount.toLocaleString()}`
           : "-"}
       </GridCell>
 
-      <GridCell field="status" setEditingCell={setEditingCell} setRows={setRows} rowIndex={rowIndex} activeCell={activeCell} setActiveCell={setActiveCell} columnIndex={7}>
+      <GridCell field="status" rowIndex={rowIndex} columnIndex={7} error={error}>
         {row.status}
       </GridCell>
     </div>

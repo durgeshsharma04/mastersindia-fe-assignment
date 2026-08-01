@@ -24,7 +24,41 @@ export default function Grid({ rows }: GridProps) {
     row: number;
     col: number;
   } | null>(null);
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
+
   const { activeCell, setActiveCell, handleKeyDown } = useKeyboardNavigation(rows.length, columns.length);
+  const isAllSelected = rows.length > 0 && (selectedRows && selectedRows.size === rows.length);
+  const GSTIN_REGEX =
+  /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
+
+const isValidGSTIN = (gstin: string)=>{
+    return GSTIN_REGEX.test(gstin.trim().toUpperCase());
+}
+
+  const saveEdit = (rowIndex: number, field: string, inputValue: string) => {
+    if (field === "vendor_gstin" && !isValidGSTIN(inputValue)) {
+      setError("Invalid GSTIN format. Please enter a valid GSTIN.");
+      return;
+    }else{
+      setError(null);
+    }
+      setRowsData((prevRows) =>
+        prevRows.map((row, index) => {
+          if (index !== rowIndex) return row;
+
+          return {
+            ...row,
+            [field]: inputValue,
+            status: "unreconciled",
+          };
+        })
+      );
+
+    if (setEditingCell) {
+      setEditingCell(null);
+    }
+  };
 
   const handleSetActiveCell = (cell: { row: number; col: number } | null) => {
     if (cell) {
@@ -32,10 +66,45 @@ export default function Grid({ rows }: GridProps) {
     }
   };
 
+  const selectallRows = () => {
+    if (isAllSelected) {
+      setSelectedRows(new Set());
+      return;
+    }
+
+    setSelectedRows(new Set(rows.map((row) => row.id)));
+  }
+
+  const handleSelectRow = (rowId: string) => {
+    const newSelectedRows = new Set(selectedRows);
+    if (newSelectedRows.has(rowId)) {
+      newSelectedRows.delete(rowId);
+    } else {
+      newSelectedRows.add(rowId);
+    }
+    setSelectedRows(newSelectedRows);
+  }
+
+  const markAsReconciled = () => {
+    console.log("Marking as reconciled for selected rows:");
+    setRowsData((prevRows) =>
+      prevRows.map((row) => {
+        if (selectedRows.has(row.id)) {
+          return {
+            ...row,
+            status: "matched",
+          };
+        }
+        return row;
+      })
+    );
+    setSelectedRows(new Set());
+  }
+
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} className="flex h-screen w-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow outline-none">
-      <GridHeader columns={columns} />
-      <GridBody activeCell={activeCell} setActiveCell={handleSetActiveCell} rows={rowsData} setRows={setRowsData} editingCell={editingCell} setEditingCell={setEditingCell}/>
+      <GridHeader error={error} selectedRows={selectedRows} selectallRows={selectallRows} columns={columns} markAsReconciled={markAsReconciled}/>
+      <GridBody error={error} selectedRows={selectedRows} handleSelectRow={handleSelectRow} activeCell={activeCell} setActiveCell={handleSetActiveCell} rows={rowsData} saveEdit={saveEdit} editingCell={editingCell} setEditingCell={setEditingCell} />
     </div>
   );
 }

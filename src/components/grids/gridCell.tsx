@@ -1,19 +1,19 @@
 import { ReactNode, useState } from "react";
-import { Invoice } from "../../types/invoice";
 
 interface Props {
   children: ReactNode;
   columnIndex: number;
-  activeCell: { row: number; col: number } | null;
-  setActiveCell: (cell: { row: number; col: number } | null) => void;
+  activeCell?: { row: number; col: number } | null;
+  setActiveCell?: (cell: { row: number; col: number } | null) => void;
   rowIndex: number;
   field: string;
   editingCell?: { row: number; col: number } | null;
   setEditingCell?: (cell: { row: number; col: number } | null) => void;
-  setRows?: React.Dispatch<React.SetStateAction<Invoice[]>>;
+  saveEdit?: (rowIndex: number, field: string, inputValue: string) => void;
+  error?: string | null;
 }
 
-export default function GridCell({ children, activeCell, setActiveCell, columnIndex, rowIndex, field, editingCell, setEditingCell, setRows }: Props) {
+export default function GridCell({ children, activeCell, setActiveCell, columnIndex, rowIndex, field, editingCell, setEditingCell, saveEdit, error }: Props) {
   const [inputValue, setInputValue] = useState("");
   const isActive =
     activeCell?.row === rowIndex &&
@@ -24,7 +24,7 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
     editingCell?.col === columnIndex;
 
   const handleDoubleClick = () => {
-    if (setEditingCell) {
+    if (setEditingCell && !error) {
       setEditingCell({
         row: rowIndex,
         col: columnIndex,
@@ -33,28 +33,10 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
     }
   }
 
-  const saveEdit = () => {
-    if (setRows) {
-      setRows((prevRows) =>
-        prevRows.map((row, index) => {
-          if (index !== rowIndex) return row;
 
-          return {
-            ...row,
-            [field]: inputValue,
-            status: "unreconciled",
-          };
-        })
-      );
-    }
-
-    if (setEditingCell) {
-      setEditingCell(null);
-    }
-  };
 
   const handleOnClick = () => {
-    setActiveCell({
+   setActiveCell && setActiveCell({
       row: rowIndex,
       col: columnIndex,
     });
@@ -67,11 +49,11 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     console.log("Key pressed:", e.key);
     if (e.key === "Enter") {
-      saveEdit();
+      saveEdit && saveEdit(rowIndex, field, inputValue);
     }
 
      if (e.key === "Escape") {
-      if (setEditingCell) {
+      if (setEditingCell && !error) {
         setEditingCell(null);
       }
     }
@@ -83,7 +65,7 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
         autoFocus
         value={inputValue}
         onChange={handleChange}
-        onBlur={saveEdit}
+        onBlur={saveEdit && (() => saveEdit(rowIndex, field, inputValue))}
         onKeyDown={handleKeyDown}
       />
     );
