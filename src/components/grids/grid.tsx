@@ -1,6 +1,7 @@
 import GridHeader from "./gridHeader";
 import GridBody from "./gridBoady";
 import { Invoice } from "../../types/invoice";
+import type { CellPosition } from "../../types/grid";
 import { useKeyboardNavigation } from "../../hooks/keyboardNavigationHook";
 import { useState, useRef, useEffect } from "react";
 
@@ -20,10 +21,7 @@ const columns = [
 
 export default function Grid({ rows }: GridProps) {
   const [rowsData, setRowsData] = useState<Invoice[]>(rows);
-  const [editingCell, setEditingCell] = useState<{
-    row: number;
-    col: number;
-  } | null>(null);
+  const [editingCell, setEditingCell] = useState<CellPosition | null>(null);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -44,7 +42,7 @@ const isValidGSTIN = (gstin: string)=>{
     return GSTIN_REGEX.test(gstin.trim().toUpperCase());
 }
 
-  const saveEdit = (rowIndex: number, field: string, inputValue: string) => {
+  const saveEdit = (id: string, field: string, inputValue: string) => {
     if (field === "vendor_gstin" && !isValidGSTIN(inputValue)) {
       setError("Invalid GSTIN format. Please enter a valid GSTIN.");
       return;
@@ -52,8 +50,8 @@ const isValidGSTIN = (gstin: string)=>{
       setError(null);
     }
       setRowsData((prevRows) =>
-        prevRows.map((row, index) => {
-          if (index !== rowIndex) return row;
+        prevRows.map((row) => {
+          if (row.id !== id) return row;
 
           return {
             ...row,
@@ -69,7 +67,7 @@ const isValidGSTIN = (gstin: string)=>{
     }
   };
 
-  const handleSetActiveCell = (cell: { row: number; col: number } | null) => {
+  const handleSetActiveCell = (cell: CellPosition | null) => {
     if (cell) {
       setActiveCell(cell);
     }

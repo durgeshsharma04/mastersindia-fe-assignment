@@ -1,21 +1,9 @@
 import { useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import GridRow from "./gridRow";
-import { Invoice } from "../../types/invoice";
+import type { GridBodyProps } from "../../types/grid";
 
-interface Props {
-  rows: Invoice[];
-  activeCell: { row: number; col: number } | null;
-  setActiveCell: (cell: { row: number; col: number } | null) => void;
-  saveEdit: (rowIndex: number, field: string, inputValue: string) => void;
-  editingCell: { row: number; col: number } | null;
-  setEditingCell: (cell: { row: number; col: number } | null) => void;
-  handleSelectRow?: (rowId: string) => void;
-  selectedRows?: Set<string>;
-  error : string | null;
-}
-
-export default function GridBody({ rows, activeCell, setActiveCell, saveEdit, editingCell, setEditingCell, handleSelectRow, selectedRows, error }: Props) {
+export default function GridBody({ rows, activeCell, setActiveCell, saveEdit, editingCell, setEditingCell, handleSelectRow, selectedRows, error }: GridBodyProps) {
   const parentRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({

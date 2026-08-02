@@ -1,19 +1,7 @@
-import { ReactNode, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import type { GridCellProps } from "../../types/grid";
 
-interface Props {
-  children: ReactNode;
-  columnIndex: number;
-  activeCell?: { row: number; col: number } | null;
-  setActiveCell?: (cell: { row: number; col: number } | null) => void;
-  rowIndex: number;
-  field: string;
-  editingCell?: { row: number; col: number } | null;
-  setEditingCell?: (cell: { row: number; col: number } | null) => void;
-  saveEdit?: (rowIndex: number, field: string, inputValue: string) => void;
-  error?: string | null;
-}
-
-export default function GridCell({ children, activeCell, setActiveCell, columnIndex, rowIndex, field, editingCell, setEditingCell, saveEdit, error }: Props) {
+export default function GridCell({ children, activeCell, setActiveCell, columnIndex, rowIndex, field, editingCell, setEditingCell, saveEdit, error, id }: GridCellProps) {
   const [inputValue, setInputValue] = useState("");
   const isActive =
     activeCell?.row === rowIndex &&
@@ -53,7 +41,7 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
        e.stopPropagation();
-      saveEdit && saveEdit(rowIndex, field, inputValue);
+      saveEdit && saveEdit(id, field, inputValue);
     }
 
     if (e.key === "Escape") {
@@ -69,7 +57,7 @@ export default function GridCell({ children, activeCell, setActiveCell, columnIn
         autoFocus
         value={inputValue}
         onChange={handleChange}
-        onBlur={saveEdit && (() => saveEdit(rowIndex, field, inputValue))}
+        onBlur={saveEdit && (() => saveEdit(id, field, inputValue))}
         onKeyDown={handleKeyDown}
       />
     );
