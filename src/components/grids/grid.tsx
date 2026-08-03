@@ -3,7 +3,7 @@ import GridBody from "./gridBoady";
 import { Invoice } from "../../types/invoice";
 import type { CellPosition } from "../../types/grid";
 import { useKeyboardNavigation } from "../../hooks/keyboardNavigationHook";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 
 interface GridProps {
   rows: Invoice[];
@@ -24,42 +24,49 @@ export default function Grid({ rows }: GridProps) {
   const [editingCell, setEditingCell] = useState<CellPosition | null>(null);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<Set<string>>(new Set());
   const gridRef = useRef<HTMLDivElement>(null);
+  const GSTIN_REGEX =
+    /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
 
-  const { activeCell, setActiveCell, handleKeyDown } = useKeyboardNavigation(rows.length, columns.length-1, setEditingCell);
-  
   useEffect(() => {
     if (gridRef.current) {
       gridRef.current.focus();
     }
   }, []);
 
-  const isAllSelected = rows.length > 0 && (selectedRows && selectedRows.size === rows.length);
-  const GSTIN_REGEX =
-  /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
+  const filteredRows = useMemo(() => {
+    return rowsData.filter((row) =>
+      selectedFilter.size === 0 || selectedFilter.has(row.status)
+    );
+  }, [rowsData, selectedFilter]);
 
-const isValidGSTIN = (gstin: string)=>{
+
+  const { activeCell, setActiveCell, handleKeyDown } = useKeyboardNavigation(filteredRows.length, columns.length - 1, setEditingCell);
+  const isAllSelected = filteredRows.length > 0 && (selectedRows && selectedRows.size === filteredRows.length);
+
+  const isValidGSTIN = (gstin: string) => {
     return GSTIN_REGEX.test(gstin.trim().toUpperCase());
-}
+  }
 
   const saveEdit = (id: string, field: string, inputValue: string) => {
     if (field === "vendor_gstin" && !isValidGSTIN(inputValue)) {
       setError("Invalid GSTIN format. Please enter a valid GSTIN.");
       return;
-    }else{
+    } else {
       setError(null);
     }
-      setRowsData((prevRows) =>
-        prevRows.map((row) => {
-          if (row.id !== id) return row;
+    setRowsData((prevRows) =>
+      prevRows.map((row) => {
+        if (row.id !== id) return row;
 
-          return {
-            ...row,
-            [field]: inputValue,
-            status: "unreconciled",
-          };
-        })
-      );
+        return {
+          ...row,
+          [field]: inputValue,
+          status: "unreconciled",
+        };
+      })
+    );
 
     if (setEditingCell) {
       setEditingCell(null);
@@ -73,13 +80,13 @@ const isValidGSTIN = (gstin: string)=>{
     }
   };
 
-  const selectallRows = () => {
+  const selectAllRows = () => {
     if (isAllSelected) {
       setSelectedRows(new Set());
       return;
     }
 
-    setSelectedRows(new Set(rows.map((row) => row.id)));
+    setSelectedRows(new Set(filteredRows.map((row) => row.id)));
   }
 
   const handleSelectRow = (rowId: string) => {
@@ -93,7 +100,6 @@ const isValidGSTIN = (gstin: string)=>{
   }
 
   const markAsReconciled = () => {
-    console.log("Marking as reconciled for selected rows:");
     setRowsData((prevRows) =>
       prevRows.map((row) => {
         if (selectedRows.has(row.id)) {
@@ -106,12 +112,13 @@ const isValidGSTIN = (gstin: string)=>{
       })
     );
     setSelectedRows(new Set());
+    gridRef.current?.focus();
   }
 
   return (
     <div tabIndex={0} ref={gridRef} onKeyDown={handleKeyDown} className="flex h-screen w-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow outline-none">
-      <GridHeader error={error} selectedRows={selectedRows} selectallRows={selectallRows} columns={columns} markAsReconciled={markAsReconciled}/>
-      <GridBody error={error} selectedRows={selectedRows} handleSelectRow={handleSelectRow} activeCell={activeCell} setActiveCell={handleSetActiveCell} rows={rowsData} saveEdit={saveEdit} editingCell={editingCell} setEditingCell={setEditingCell} />
+      <GridHeader error={error} selectedFilter={selectedFilter} setSelectedFilter={setSelectedFilter} selectedRows={selectedRows} selectAllRows={selectAllRows} columns={columns} markAsReconciled={markAsReconciled} />
+      <GridBody error={error} selectedRows={selectedRows} handleSelectRow={handleSelectRow} activeCell={activeCell} setActiveCell={handleSetActiveCell} rows={filteredRows} saveEdit={saveEdit} editingCell={editingCell} setEditingCell={setEditingCell} />
     </div>
   );
 }

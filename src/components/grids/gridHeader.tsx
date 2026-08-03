@@ -1,19 +1,32 @@
 
+import Filter from "../filter";
+
 interface GridHeaderProps {
   columns: string[];
   selectedRows: Set<string>;
-  selectallRows: () => void;
+  selectAllRows: () => void;
   markAsReconciled: () => void;
   error: string | null;
+  selectedFilter: Set<string>;
+  setSelectedFilter: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-export default function GridHeader({ selectedRows, selectallRows, columns, markAsReconciled, error }: GridHeaderProps) {
+const statuses = [
+    "matched",
+    "amount_mismatch",
+    "gstin_mismatch",
+    "missing_in_gstr2b",
+    "unreconciled",
+];
+
+export default function GridHeader({ selectedRows, selectAllRows, columns, markAsReconciled, error, selectedFilter, setSelectedFilter }: GridHeaderProps) {
     const isAllSelected = selectedRows && selectedRows.size > 0;
   return (
     <>
     <div className="flex items-center justify-between px-4 py-2 border-b">
       <span className="text-gray-700 font-semibold text-sm px-4 py-2">Selected Rows: {selectedRows.size}</span>
       {error && <span className="text-red-500 font-semibold text-sm px-4 py-2">{error}</span>}
+      <Filter selectedStatus={selectedFilter} setSelectedFilter={setSelectedFilter} options={statuses} />
       <button disabled={!isAllSelected} onClick={markAsReconciled} className={`${!isAllSelected ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'} text-white px-4 py-2 rounded`}>
         Mark as Reconciled
       </button>
@@ -34,7 +47,7 @@ export default function GridHeader({ selectedRows, selectallRows, columns, markA
       <input
         type="checkbox"
         checked={isAllSelected}
-        onChange={selectallRows}
+        onChange={selectAllRows}
       />
       </div>
       {columns.map((column) => (
